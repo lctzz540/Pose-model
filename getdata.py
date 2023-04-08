@@ -8,11 +8,13 @@ pose_estimator = mp.solutions.pose.Pose(
     min_detection_confidence=0.5, min_tracking_confidence=0.5
 )
 
-video_dir = "./video/Tree Pose/"
+video_dir = "./video/WarriorPose_Left/"
 
 csv_dir = "./dataset/"
-
+done = 0
 for filename in os.listdir(video_dir):
+    if filename == ".DS_Store":
+        continue
     video_name = os.path.splitext(filename)[0]
 
     cap = cv2.VideoCapture(os.path.join(video_dir, filename))
@@ -27,6 +29,8 @@ for filename in os.listdir(video_dir):
 
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         results = pose_estimator.process(image)
+        if results.pose_landmarks is None:
+            continue
 
         keypoints = []
         for landmark in results.pose_landmarks.landmark:
@@ -43,8 +47,11 @@ for filename in os.listdir(video_dir):
             df = keypoints.to_frame()
         else:
             df = df.hstack(keypoints.to_frame())
+    try:
+        df = df.transpose()
+        df.write_csv(os.path.join(csv_dir, f"{video_name}.csv"))
+        done += 1
+    except:
+        pass
 
-    df = df.transpose()
-    df.write_csv(os.path.join(csv_dir, f"{video_name}.csv"))
-
-print("done!")
+print(f"Done {done}/{len(os.listdir(video_dir))}")
