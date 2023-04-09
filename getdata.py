@@ -2,15 +2,15 @@ import os
 import cv2
 import polars as pl
 import mediapipe as mp
+from parse import args
 
 
 pose_estimator = mp.solutions.pose.Pose(
     min_detection_confidence=0.5, min_tracking_confidence=0.5
 )
 
-video_dir = "./video/WarriorPose_Left/"
-
-csv_dir = "./dataset/"
+video_dir = args.video_dir
+csv_dir = args.csv_dir
 done = 0
 for filename in os.listdir(video_dir):
     if filename == ".DS_Store":

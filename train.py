@@ -1,35 +1,12 @@
-import matplotlib.pyplot as plt
 import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
 from data import PoseDataset
 from network import LSTMPoseClassifier
+from parse import args
+from graph import exportgraph
 
-import argparse
-
-parser = argparse.ArgumentParser()
-parser.add_argument("--device", type=str, default="cpu",
-                    help="device to train on")
-parser.add_argument(
-    "--epochs", type=int, default=10, help="number of epochs to train for"
-)
-parser.add_argument(
-    "--train_ratio", type=float, default=0.75, help="ratio of data to use for training"
-)
-parser.add_argument(
-    "--train-data-folder",
-    type=str,
-    default="./dataset/train/",
-    help="path to train data folder",
-)
-parser.add_argument(
-    "--valid-data-folder",
-    type=str,
-    default="./dataset/valid/",
-    help="path to validation data folder",
-)
-args = parser.parse_args()
 
 device = torch.device(args.device)
 
@@ -124,20 +101,4 @@ for epoch in range(num_epochs):
         print(f"Early stopping after {epoch+1} epochs")
         break
 
-plt.plot(train_loss, label="Train")
-plt.plot(valid_losses, label="Validation")
-plt.title("Training and Validation Loss")
-plt.xlabel("Epoch")
-plt.ylabel("Loss")
-plt.legend()
-plt.savefig("loss.png")
-plt.show()
-
-plt.plot(train_acc, label="Train")
-plt.plot(valid_acc, label="Validation")
-plt.title("Training and Validation Accuracy")
-plt.xlabel("Epoch")
-plt.ylabel("Accuracy")
-plt.legend()
-plt.savefig("accuracy.png")
-plt.show()
+exportgraph(train_loss, valid_losses, train_acc, valid_acc)
